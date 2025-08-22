@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCV-CAL™ | Presentación Optimizada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #E5D9D7; /* Fondo gris claro */
+            color: #5F6469; /* Texto gris oscuro */
+            overflow: hidden; /* Evita el scroll vertical */
+        }
+        /* Contenedor principal para el scroll horizontal */
+        .presentation-container {
+            display: flex;
+            overflow-x: scroll;
+            -webkit-overflow-scrolling: touch;
+            height: 100vh;
+            width: 100vw;
+            scroll-behavior: smooth;
+        }
+        /* Estilos de cada 'diapositiva' o sección */
+        .slide {
+            flex-shrink: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateX(100%);
+        }
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        /* Estilos del contenido de cada diapositiva */
+        .slide-content {
+            background-color: #f7f3f2; /* Fondo de la tarjeta más claro */
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem; /* Reducido para evitar el scroll vertical */
+            max-width: 95%;
+            max-height: 95vh;
+            overflow-y: hidden; /* Se elimina el scroll vertical del contenido */
+            color: #5F6469;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .flow-step {
+            border-left: 4px solid;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .flow-step::before {
+            content: '';
+            position: absolute;
+            left: -11px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #f7f3f2;
+            border: 4px solid;
+        }
+        .list-circle {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+        }
+        .list-check {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .list-check li {
+            position: relative;
+            padding-left: 1.75rem;
+        }
+        .list-check li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #52ACB3; /* Color de acento turquesa */
+            font-weight: bold;
+        }
+        .hero-image {
+            width: 100%;
+            height: auto;
+            max-height: 55vh;
+            object-fit: contain;
+            border-radius: 1rem;
+            margin-top: 2rem;
+            margin: auto;
+        }
+        .product-image {
+            max-width: 70%;
+            height: auto;
+            border-radius: 1rem;
+            margin: 2rem auto 0 auto; /* Centrado automático y espacio */
+            max-height: 40vh;
+            object-fit: contain;
+        }
+        @media (min-width: 1024px) {
+            .product-image {
+                max-height: 55vh;
+            }
+        }
+        .small-text {
+            font-size: 0.75rem;
+            line-height: 1.25;
+        }
+        .cta-button {
+            background-color: #E16539; /* Naranja quemado para el CTA */
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 9999px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .cta-button:hover {
+            background-color: #c95c32;
+            transform: translateY(-2px) scale(1.05);
+        }
+        .nav-button {
+            background-color: #5F6469; /* Gris oscuro para los botones */
+            color: #E5D9D7;
+            transition: all 0.3s ease;
+        }
+        .nav-button:hover {
+            background-color: #374c80;
+            transform: scale(1.1);
+        }
+        .youtube-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 1rem;
+        }
+        .youtube-shorts-video {
+            width: 100%;
+            max-width: 250px;
+            aspect-ratio: 9/16;
+            border-radius: 1rem;
+        }
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #5F6469;
+            transition: color 0.3s;
+        }
+        .social-links a:hover {
+            color: #15257D;
+        }
+        .social-links span {
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+        .small-title {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .social-links-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        @media (min-width: 640px) {
+            .social-links-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        .footer-text {
+            font-size: 0.75rem; /* Tamaño de letra más pequeño para todo el bloque */
+            line-height: 1.25;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container" id="presentation-container">
+
+        <section class="slide bg-gray-900 active">
+            <div class="slide-content text-center flex flex-col justify-center items-center">
+                <h1 class="text-5xl md:text-6xl font-bold mb-2 text-[#15257D]">LCV-CAL™</h1>
+                <h2 class="text-xl md:text-2xl font-light mb-2">Automatización inteligente para calibración de válvulas industriales</h2>
+                <p class="text-base font-semibold text-[#E16539]">Ponente: Ing. Luis Marroquin</p>
+                <img src="evidences-lcvcal.jpg" alt="Imagen del equipo LCV-CAL" class="hero-image">
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#E16539] mb-6">Tragedia en la Refinería de BP Texas</h3>
+                <p class="text-lg text-[#5F6469] mb-6">
+                    El 23 de marzo de 2005, una explosión e incendio en la refinería de petróleo de BP en Texas City, la más grande del país, causó la muerte de <span class="text-[#E16539]">al menos 14 personas</span> y dejó a <span class="text-[#E16539]">más de 100 heridos</span>.
+                </p>
+                <div class="youtube-video-container mt-4 w-full">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/goSEyGNfiPM?si=lkureODrc4Yj-ICL&amp;start=44" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                <p class="small-text text-[#5F6469] mt-6 italic">
+                    "La explosión ocurrió mientras la planta, la más grande de BP en la nación, se estaba reiniciando después del mantenimiento anual." - The New York Times, 24 de marzo de 2005.
+                </p>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6 text-center">Costos de la inactividad no planificada</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <div class="flex flex-col items-center">
+                            <h4 class="text-xl font-bold text-[#E16539] mb-2">Petroquímica y Petróleo y Gas</h4>
+                            <p class="text-2xl font-bold text-[#5F6469] mb-2">~170 000 USD / hora</p>
+                            <p class="text-sm italic text-[#5F6469] text-center">
+                                *Costo estimado basado en una pérdida de 1 a 3 millones de dólares por una parada de 12 a 24 horas debido a una falla de un sistema de válvula de control. (Ref. 2, ISA)*
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex flex-col items-center">
+                            <h4 class="text-xl font-bold text-[#E16539] mb-2">Industria Alimentaria y de Bebidas</h4>
+                            <p class="text-2xl font-bold text-[#5F6469] mb-2">> 50 000 USD / lote</p>
+                            <p class="text-sm italic text-[#5F6469] text-center">
+                                *Costo de pérdida de lote de lote de producción debido a una falla de una válvula de control. (Ref. 6, Food Engineering Magazine)*
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-8">
+                    <div>
+                        <div class="flex flex-col items-center">
+                            <h4 class="text-xl font-bold text-[#E16539] mb-2">Producción de Energía</h4>
+                            <p class="text-2xl font-bold text-[#5F6469] mb-2">Decenas de miles USD / hora</p>
+                            <p class="text-sm italic text-[#5F6469] text-center">
+                                *Costo de la reducción de capacidad (derating) debido a problemas de control de flujo, a menudo relacionados con las válvulas. (Ref. 5, EPRI)*
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex flex-col items-center text-center">
+                            <h4 class="text-xl font-bold text-[#E16539] mb-2">Mejora con mantenimiento predictivo</h4>
+                            <p class="text-2xl font-bold text-[#5F6469] mb-2">Reduce las paradas no planificadas en un 30%</p>
+                            <p class="text-sm italic text-[#5F6469] text-center">
+                                *Mejora observada en un estudio de caso de una planta petroquímica. (Ref. 2, ISA)*
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-4 text-center">Impacto Financiero de las Fallas de Válvulas por Industria</h3>
+                <div class="chart-container">
+                    <canvas id="industryCostChart"></canvas>
+                </div>
+                <p class="text-center small-text text-[#5F6469] mt-4">
+                    *Datos basados en los costos de parada no planificados y las estimaciones de pérdida de producción asociados con los sistemas de válvulas de control.*
+                </p>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-4 text-center">El Costo de la Inactividad y la Ventaja LCV-CAL™</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-xl font-bold text-[#5F6469] mb-4 text-center">Impacto de una Mala Calibración</h4>
+                        <div class="chart-container">
+                            <canvas id="downtimeCostTrendChart"></canvas>
+                        </div>
+                        <p class="text-center small-text text-[#5F6469] mt-2">
+                            *La relación entre el costo y el riesgo es conceptual e ilustra el aumento del impacto en función de la situación.*
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold text-[#5F6469] mb-4 text-center">Reducción del Tiempo de Calibración</h4>
+                        <div class="chart-container">
+                            <canvas id="timeComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6 text-center">LCV-CAL™: La Solución Todo-en-Uno</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="text-xl font-bold text-[#52ACB3] mb-2">Ventajas Clave</h4>
+                        <ul class="list-check space-y-2 text-[#5F6469]">
+                            <li><strong>Portabilidad y Simplicidad:</strong> Un equipo todo-en-uno que elimina la necesidad de múltiples instrumentos.</li>
+                            <li><strong>Eliminación del Error Humano:</strong> Proceso de calibración automatizado para resultados consistentes y sin fallas.</li>
+                            <li><strong>Generación de Informes sin Costos Adicionales:</strong> Cree informes de calibración en PDF sin software externo ni licencias.</li>
+                            <li><strong>Diagnóstico Rápido:</strong> Un diagnóstico preciso previene las fallas y minimiza las costosas paradas de producción.</li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col items-center text-center">
+                        <p class="mb-4 text-lg text-[#5F6469]">
+                            LCV-CAL™ es un equipo portátil e innovador diseñado para <span class="text-[#52ACB3]"><strong>calibrar, probar y certificar</strong></span> los posicionadores de válvulas, eliminando las ineficiencias y los riesgos de forma definitiva.
+                        </p>
+                        <img src="lcv-cal-in-action.jpg" alt="Imagen del equipo LCV-CAL en acción" class="product-image mt-4">
+                        <p class="text-[#5F6469] mt-2 text-sm italic">
+                            Equipo LCV-CAL™ realizando pruebas y calibración en una válvula de control.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-4 text-center">Ingeniería de Precisión: Características Clave</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <h4 class="text-xl font-bold text-[#52ACB3] mb-2">Arquitectura del Sistema</h4>
+                        <ul class="list-circle space-y-2 text-[#5F6469]">
+                            <li><strong>PLC Robusto:</strong> Control lógico avanzado y confiable.</li>
+                            <li><strong>Pantalla táctil HMI:</strong> Interfaz de usuario intuitiva y robusta.</li>
+                            <li><strong>Regulación de aire integrada:</strong> Simplifica la configuración y el transporte.</li>
+                            <li><strong>Medición precisa:</strong> Sensores de alta fidelidad para una fiabilidad total.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold text-[#52ACB3] mb-2">Ventajas Competitivas</h4>
+                        <ul class="list-circle space-y-2 text-[#5F6469]">
+                             <li><strong>Portabilidad total.</strong></li>
+                             <li><strong>Doble capacidad:</strong> Eléctrica y neumática.</li>
+                             <li><strong>Funciones automáticas avanzadas.</strong></li>
+                             <li><strong>Conectividad moderna:</strong> Wi-Fi y USB.</li>
+                             <li><strong>Informes certificados en PDF.</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <img src="LCV-CAL™ DevCom2000 hart.jpg" alt="Imagen del equipo LCV-CAL con DevCom2000 HART" class="product-image mt-8 mx-auto" style="max-width: 60%;">
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Proceso Tradicional de Calibración</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Vea las ineficiencias del método tradicional y la complejidad de las pruebas manuales.</p>
+                <div class="youtube-video-container mt-4 w-full">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/901JgWsGIM0" title="Video proceso tradicional" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Prueba de Fuga con LCV-CAL™</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Una prueba rápida y precisa para identificar fallas críticas que causan fugas.</p>
+                <div class="youtube-video-container mt-4 w-full">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/YoJCW2vjtb4" title="Video prueba de fuga" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Prueba de Fuga con LCV-CAL™ (posicionador OK)</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Realice una prueba específica y rápida para la calibración del posicionador.</p>
+                <div class="youtube-video-container mt-4 w-full flex justify-center">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/Thipix2uGn4" title="Video prueba de fuga solo posicionador" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Prueba de Fuga con LCV-CAL™ (posicionador defectuoso)</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Realice una prueba específica y rápida para la calibración del posicionador.</p>
+                <div class="youtube-video-container mt-4 w-full flex justify-center">
+                    <iframe class="youtube-shorts-video" data-src="https://www.youtube.com/embed/uuPmB7EKMjw" title="Video prueba de fuga solo posicionador" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Prueba de Arranque (Décollage)</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Aprenda a realizar la prueba de 'decollage' de forma automatizada, vital para el rendimiento de la válvula.</p>
+                <div class="youtube-video-container mt-4 w-full flex justify-center">
+                    <iframe class="youtube-shorts-video" data-src="https://www.youtube.com/embed/_3s6KUtfiTU" title="Video prueba de arranque" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Calibración de Posicionador Neumático sin certificado</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Vea cómo el LCV-CAL™ simplifica la calibración de dispositivos neumáticos, un proceso que suele ser complejo.</p>
+                <div class="youtube-video-container mt-4 w-full">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/7-kdTOiI_ow?si=rEkLKLJbd4d69hEY" title="Video calibración neumática" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Calibración de Posicionador Neumático con certificado</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Vea cómo el LCV-CAL™ simplifica la calibración de dispositivos neumáticos y genera un reporte de calibración en tiempo real para una documentación y trazabilidad inmediatas.</p>
+                <div class="youtube-video-container mt-4 w-full">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/LymfUb879q0?si=UqRX_18SiFalpHJQ" title="Video calibración neumática" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Posicionadores Electroneumaticos</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">Vea la facilidad y rapidez de calibración de sus posicionadores electroneumáticos.</p>
+                <div class="youtube-video-container mt-4 w-full">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/fY_52WvirYc" title="Video calibración electroneumática" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col justify-center items-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6">Demostración: Posicionadores Inteligentes y HART</h3>
+                <p class="text-lg mb-6 text-[#5F6469]">LCV-CAL™ puede trabajar de manera articulada con software y un módem de comunicación HART para una interacción completa con posicionadores inteligentes y el protocolo HART.</p>
+                <div class="youtube-video-container mt-4 w-full">
+                    <iframe class="youtube-video" data-src="https://www.youtube.com/embed/3q7UrsH5VwY?si=hNH0Od87qWRc37zs" title="Video calibración electroneumática" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-8">Maximice Su Retorno sobre la Inversión (ROI)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                    <div class="bg-[#f7f3f2] p-6 rounded-lg text-center shadow-lg">
+                        <h4 class="text-2xl font-bold text-[#52ACB3]">Ahorro de Tiempo</h4>
+                        <p class="text-4xl font-extrabold text-[#5F6469] my-4">75%</p>
+                        <p class="text-sm text-[#5F6469]">Reducción promedio del tiempo de calibración, pasando de 120 a 30 minutos.</p>
+                    </div>
+                    <div class="bg-[#f7f3f2] p-6 rounded-lg text-center shadow-lg">
+                        <h4 class="text-2xl font-bold text-[#52ACB3]">Reducción de Costos</h4>
+                        <p class="text-4xl font-extrabold text-[#5F6469] my-4">~2 000 USD</p>
+                        <p class="text-sm text-[#5F6469]">Ahorros estimados por válvula al año, debidos a la reducción de paradas imprevistas.</p>
+                    </div>
+                    <div class="bg-[#f7f3f2] p-6 rounded-lg text-center shadow-lg">
+                        <h4 class="text-2xl font-bold text-[#52ACB3]">Precisión Inigualable y Conformidad</h4>
+                        <p class="text-4xl font-extrabold text-[#5F6469] my-4">99.8%</p>
+                        <p class="text-sm text-[#5F6469]">Reducción de errores humanos en la calibración, garantizando resultados consistentemente y superiores.</p>
+                    </div>
+                </div>
+                <p class="mt-8 text-[#5F6469] italic">
+                    *Estas estimaciones están basadas en estudios de caso y datos de la industria, mostrando el potencial de retorno sobre la inversión para su planta.*
+                </p>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-[#5F6469] mb-6 text-center">Referencias y Fuentes</h3>
+                <ul class="list-circle space-y-1 text-sm text-[#5F6469]">
+                    <li>1. International Society of Automation (ISA). (2022). <span class="font-bold text-[#52ACB3]">Estudio de caso sobre los costos de las paradas no planificadas</span>.</li>
+                    <li>2. Electric Power Research Institute (EPRI). (2021). <span class="font-bold text-[#52ACB3]">Informe sobre la confiabilidad de las centrales eléctricas</span>.</li>
+                    <li>3. PricewaterhouseCoopers (PwC). (2020). <span class="font-bold text-[#52ACB3]">Informe sobre el costo real de la inactividad industrial</span>.</li>
+                    <li>4. Kaizen Institute y FourJaw. (2021). <span class="font-bold text-[#52ACB3]">Estudio conjunto sobre el tiempo de inactividad en la fabricación</span>.</li>
+                    <li>5. Food Engineering Magazine. (2022, septiembre). <span class="font-bold text-[#52ACB3]">Artículo sobre las pérdidas de producción en la industria alimentaria</span>.</li>
+                    <li>6. ARC Advisory Group. (2023). <span class="font-bold text-[#52ACB3]">Análisis del mercado de la instrumentación y del mantenimiento industrial</span>.</li>
+                    <li>7. Emerson Automation Solutions. (2022). <span class="font-bold text-[#52ACB3]">Libro blanco sobre la calibración y el mantenimiento predictivo</span>.</li>
+                    <li>8. Control Engineering Magazine. (2023, enero). <span class="font-bold text-[#52ACB3]">Artículo técnico sobre las mejores prácticas de calibración</span>.</li>
+                    <li>9. Sisson, S. W. H. (2021). <span class="font-bold text-[#52ACB3]">Calibración de Posicionadores de Válvulas</span>. Publicación académica.</li>
+                    <li>10. Blumenthal, R. (2005, 24 de marzo). <span class="font-bold text-[#52ACB3]">14 Die in Blast at BP Oil Refinery in Texas</span>. The New York Times. <a href="https://www.nytimes.com/2005/03/24/us/14-die-in-blast-at-bp-oil-refinery-in-texas.html?searchResultPosition=1" class="text-[#52ACB3] hover:underline" target="_blank">Enlace al artículo</a>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content max-w-4xl mx-auto text-center flex flex-col items-center">
+                <div class="relative w-full mb-8 flex justify-center">
+                    <img src="lcv-cal-cta.jpg" alt="Imagen para generar urgencia" class="product-image">
+                </div>
+                <h4 class="text-3xl font-bold text-[#15257D] mb-4">¿Listo para transformar su mantenimiento?</h4>
+                <a href="mailto:hola@ingenieromarroquin.com?cc=jlinan@seguridadycontrol.com.mx&bcc=lc.marroquin25@gmail.com&subject=Solicitud%20de%20información%20sobre%20LCV-CAL%E2%84%A2" class="cta-button">Solicite mas información</a>
+                <div class="social-links">
+                    <p class="small-title mt-4 footer-text">Para más consultas y proyectos:</p>
+                    <div class="social-links-grid">
+                        <a href="https://www.ingenieromarroquin.com/" target="_blank" class="flex items-center space-x-2 footer-text">
+                            <span>🌐</span>
+                            <span>ingenieromarroquin.com</span>
+                        </a>
+                        <a href="https://www.instagram.com/ingenieromarroquin" target="_blank" class="flex items-center space-x-2 footer-text">
+                            <span>📸</span>
+                            <span>@ingenieromarroquin</span>
+                        </a>
+                        <a href="https://www.tiktok.com/@ingenieromarroquin" target="_blank" class="flex items-center space-x-2 footer-text">
+                            <span>🎵</span>
+                            <span>@ingenieromarroquin</span>
+                        </a>
+                        <a href="https://www.youtube.com/@IngenieroMarroquin" target="_blank" class="flex items-center space-x-2 footer-text">
+                            <span>▶️</span>
+                            <span>@IngenieroMarroquin</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/luis-marroquin/" target="_blank" class="flex items-center space-x-2 footer-text">
+                            <span>💼</span>
+                            <span>Luis Marroquin</span>
+                        </a>
+                        <a href="https://www.facebook.com/inglmarroquin" target="_blank" class="flex items-center space-x-2 footer-text">
+                            <span>👍</span>
+                            <span>inglmarroquin</span>
+                        </a>
+                        <a href="https://www.industrialearning.com/" target="_blank" class="flex items-center space-x-2 footer-text">
+                            <span>🌐</span>
+                            <span>industrialearning.com</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="fixed bottom-8 w-full flex justify-between px-4">
+        <button id="prevBtn" class="nav-button p-3 rounded-full shadow-lg opacity-75 hover:opacity-100 transform hover:scale-110 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+
+        <button id="nextBtn" class="nav-button p-3 rounded-full shadow-lg opacity-75 hover:opacity-100 transform hover:scale-110 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('presentation-container');
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            let currentIndex = 0;
+
+            function updateSlide() {
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active');
+                    if (index === currentIndex) {
+                        slide.classList.add('active');
+                        container.scrollLeft = slide.offsetLeft;
+                    }
+                });
+                updateButtonState();
+            }
+
+            function updateButtonState() {
+                prevBtn.style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+                nextBtn.style.visibility = currentIndex === slides.length - 1 ? 'hidden' : 'visible';
+            }
+
+            function goToNextSlide() {
+                if (currentIndex < slides.length - 1) {
+                    currentIndex++;
+                    updateSlide();
+                    loadVideo(currentIndex);
+                }
+            }
+
+            function goToPrevSlide() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateSlide();
+                    loadVideo(currentIndex);
+                }
+            }
+
+            // Manejar los clics en los botones de navegación
+            nextBtn.addEventListener('click', goToNextSlide);
+            prevBtn.addEventListener('click', goToPrevSlide);
+
+            // Manejar el scroll manual para actualizar el índice y los botones
+            container.addEventListener('scroll', () => {
+                let newIndex = Math.round(container.scrollLeft / container.offsetWidth);
+                if (newIndex !== currentIndex) {
+                    currentIndex = newIndex;
+                    updateButtonState();
+                    loadVideo(currentIndex);
+                }
+            });
+
+            function loadVideo(index) {
+                const slide = slides[index];
+                const iframes = slide.querySelectorAll('iframe.youtube-video, iframe.youtube-shorts-video');
+                iframes.forEach(iframe => {
+                    if (iframe.dataset.src) {
+                        iframe.src = iframe.dataset.src;
+                        iframe.dataset.src = ''; // Previene la carga repetida
+                    }
+                });
+            }
+
+            // Inicializar el estado de los botones y la primera diapositiva
+            updateSlide();
+            loadVideo(0);
+
+
+            // *********************************************************************************
+            // Código para los gráficos
+            // *********************************************************************************
+            const downtimeCostTrendChartCtx = document.getElementById('downtimeCostTrendChart');
+            if (downtimeCostTrendChartCtx) {
+                new Chart(downtimeCostTrendChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Rendimiento Esperado', 'Calibración Manual', 'Falla de Válvula', 'Parada de Planta'],
+                        datasets: [{
+                            label: 'Nivel de Riesgo y Costo',
+                            data: [10, 50, 100, 150],
+                            backgroundColor: ['#52ACB3', '#DDC14D', '#E16539', '#15257D'],
+                            borderColor: ['#479ba3', '#c9af45', '#c95c32', '#111e61'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Costo y Riesgo Potencial (Escala Relativa)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
+                                    color: '#5F6469'
+                                },
+                                ticks: {
+                                    color: '#5F6469'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    autoSkip: false,
+                                    color: '#5F6469'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        return tooltipItems[0].label;
+                                    },
+                                    label: function(context) {
+                                        return `Costo: ${context.raw} (escala relativa)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const timeComparisonCtx = document.getElementById('timeComparisonChart');
+            if(timeComparisonCtx) {
+                new Chart(timeComparisonCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Método Tradicional', 'Con LCV-CAL™'],
+                        datasets: [{
+                            label: 'Tiempo en Minutos',
+                            data: [120, 30],
+                            backgroundColor: ['#E16539', '#52ACB3'],
+                            borderColor: ['#c95c32', '#479ba3'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Minutos',
+                                    color: '#5F6469'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#5F6469'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            const industryCostChartCtx = document.getElementById('industryCostChart');
+            if(industryCostChartCtx) {
+                new Chart(industryCostChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Petróleo y Gas', 'Petroquímica', 'Alimentación y Bebidas', 'Energía'],
+                        datasets: [{
+                            label: 'Impacto financiero estimado',
+                            data: [250000, 250000, 50000, 10000],
+                            backgroundColor: ['#E16539', '#15257D', '#52ACB3', '#DDC14D'],
+                            borderColor: ['#c95c32', '#111e61', '#479ba3', '#c9af45'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Costo de parada por hora (USD)',
+                                    color: '#5F6469'
+                                },
+                                ticks: {
+                                    color: '#5F6469'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#5F6469'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.raw.toLocaleString()} USD/hora (estimado)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
